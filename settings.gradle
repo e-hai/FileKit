@@ -1,0 +1,3 @@
+rootProject.name = "AnFile"
+include ':app'
+include ':file'
