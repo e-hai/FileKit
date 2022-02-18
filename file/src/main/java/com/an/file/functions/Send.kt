@@ -4,16 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import androidx.core.content.FileProvider
-import com.filex.BuildConfig
-import java.io.File
+import android.net.Uri
 
-class Send internal constructor(private val context: Context) {
+internal object Send {
 
     //分享文件
-    fun sendFile(file: File, title: String = ""): Boolean {
+    fun sendFile(context: Context, fileUri: Uri, title: String): Boolean {
         return try {
-            val fileUri = FileProvider.getUriForFile(context, BuildConfig.FILES_AUTHORITY, file)
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

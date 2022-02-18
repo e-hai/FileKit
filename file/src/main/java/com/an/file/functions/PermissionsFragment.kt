@@ -1,6 +1,9 @@
 package com.an.file.functions
 
+import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -10,8 +13,21 @@ import androidx.fragment.app.FragmentManager
 
 typealias PermissionListener = (isGranted: Boolean) -> Unit
 
-class PermissionsFragment : Fragment() {
 
+internal class PermissionsFragment : Fragment() {
+
+    private lateinit var listener: PermissionListener
+
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
+            map.forEach {
+                if (it.value == false) {
+                    listener(false)
+                    return@registerForActivityResult
+                }
+            }
+            listener(true)
+        }
 
     fun requestPermissions(permissions: Array<String>, listener: PermissionListener) {
         val context = context ?: return
@@ -33,17 +49,7 @@ class PermissionsFragment : Fragment() {
         permissions: Array<String>,
         listener: PermissionListener
     ) {
-        val resultLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
-                map.forEach {
-                    if (it.value == false) {
-                        listener(false)
-                        return@registerForActivityResult
-                    }
-                }
-                listener(true)
-            }
-
+        this.listener = listener
         resultLauncher.launch(
             permissions
         )
@@ -52,6 +58,7 @@ class PermissionsFragment : Fragment() {
     companion object {
 
         private const val TAG = "PermissionsFragment"
+
 
         fun load(activity: FragmentActivity): PermissionsFragment {
             return load(activity.supportFragmentManager)
