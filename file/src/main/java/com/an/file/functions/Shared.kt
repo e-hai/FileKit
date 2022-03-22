@@ -7,7 +7,6 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.media.Image
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -15,12 +14,6 @@ import android.provider.MediaStore
 import android.util.Log
 import com.an.file.model.MediaStoreData
 import com.an.file.model.MimeType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import java.io.*
 import java.lang.Exception
 import java.util.*
@@ -32,7 +25,7 @@ internal class Shared constructor(
 ) : Storage {
 
     //放置用户可用图片的公共目录
-    override fun createPicture(fileName: String) = flow<Uri> {
+    override fun createPicture(fileName: String): Uri {
         val resolver = context.contentResolver
         val collection =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -47,13 +40,12 @@ internal class Shared constructor(
             put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Images.Media.MIME_TYPE, MimeType.IMAGE_JPEG)
         }
-        val uri = resolver.insert(collection, details) ?: Uri.EMPTY
-        emit(uri)
-    }.flowOn(Dispatchers.IO)
+        return resolver.insert(collection, details) ?: Uri.EMPTY
+    }
 
 
     //放置用户可用音乐的公共目录
-    override fun createMusic(fileName: String) = flow<Uri> {
+    override fun createMusic(fileName: String): Uri {
         val resolver = context.contentResolver
         val collection =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -68,12 +60,11 @@ internal class Shared constructor(
             put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Audio.Media.MIME_TYPE, MimeType.AUDIO_OGG)
         }
-        val uri = resolver.insert(collection, details) ?: Uri.EMPTY
-        emit(uri)
-    }.flowOn(Dispatchers.IO)
+        return resolver.insert(collection, details) ?: Uri.EMPTY
+    }
 
     //放置用户可用视频的公共目录
-    override fun createMovie(fileName: String) = flow<Uri> {
+    override fun createMovie(fileName: String): Uri {
         val resolver = context.contentResolver
         val collection =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -88,13 +79,12 @@ internal class Shared constructor(
             put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
             put(MediaStore.Video.Media.MIME_TYPE, MimeType.VIDEO_MPEG)
         }
-        val uri = resolver.insert(collection, details) ?: Uri.EMPTY
-        emit(uri)
-    }.flowOn(Dispatchers.IO)
+        return resolver.insert(collection, details) ?: Uri.EMPTY
+    }
 
 
     //放置用户其他文件的公共目录
-    override fun createOther(fileName: String) = flow<Uri> {
+    override fun createOther(fileName: String): Uri {
         val resolver = context.contentResolver
         val collection = MediaStore.Downloads.getContentUri(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -105,9 +95,8 @@ internal class Shared constructor(
         val details = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, fileName)
         }
-        val uri = resolver.insert(collection, details) ?: Uri.EMPTY
-        emit(uri)
-    }.flowOn(Dispatchers.IO)
+        return resolver.insert(collection, details) ?: Uri.EMPTY
+    }
 
 
     private fun saveFile(saveUri: Uri, inputStream: InputStream): Uri {
@@ -133,62 +122,59 @@ internal class Shared constructor(
         }
     }
 
-    override fun savePicture(fileName: String, bitmap: Bitmap) = createPicture(fileName)
-        .map {
-            var outputStream: OutputStream? = null
-            try {
-                outputStream = context.contentResolver.openOutputStream(it)
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                it
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Uri.EMPTY
-            } finally {
-                outputStream?.flush()
-                outputStream?.close()
-            }
+    override fun savePicture(fileName: String, bitmap: Bitmap): Uri {
+        val picture = createPicture(fileName)
+        var outputStream: OutputStream? = null
+        return try {
+            outputStream = context.contentResolver.openOutputStream(picture)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            picture
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Uri.EMPTY
+        } finally {
+            outputStream?.flush()
+            outputStream?.close()
         }
-        .flowOn(Dispatchers.IO)
+    }
 
     override fun savePicture(fileName: String, inputStream: InputStream) = createPicture(fileName)
-        .map {
-            if (it.path.isNullOrEmpty()) {
+        .also {
+            return if (it.path.isNullOrEmpty()) {
                 it
             } else {
                 saveFile(it, inputStream)
             }
         }
-        .flowOn(Dispatchers.IO)
 
     override fun saveMovie(fileName: String, inputStream: InputStream) = createMovie(fileName)
-        .map {
-            if (it.path.isNullOrEmpty()) {
+        .also {
+            return if (it.path.isNullOrEmpty()) {
                 it
             } else {
                 saveFile(it, inputStream)
             }
         }
-        .flowOn(Dispatchers.IO)
+
 
     override fun saveMusic(fileName: String, inputStream: InputStream) = createMusic(fileName)
-        .map {
-            if (it.path.isNullOrEmpty()) {
+        .also {
+            return if (it.path.isNullOrEmpty()) {
                 it
             } else {
                 saveFile(it, inputStream)
             }
         }
-        .flowOn(Dispatchers.IO)
 
     override fun saveOther(fileName: String, inputStream: InputStream) = createOther(fileName)
-        .map {
-            if (it.path.isNullOrEmpty()) {
+        .also {
+            return if (it.path.isNullOrEmpty()) {
                 it
             } else {
                 saveFile(it, inputStream)
             }
         }
-        .flowOn(Dispatchers.IO)
+
 
     private fun queryMedia(
         uri: Uri,
@@ -225,7 +211,7 @@ internal class Shared constructor(
     override fun queryPicture(
         offset: Int,
         limit: Int
-    ) = flow<List<MediaStoreData>> {
+    ): List<MediaStoreData> {
         val medias = mutableListOf<MediaStoreData>()
         val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -264,13 +250,13 @@ internal class Shared constructor(
         }
 
         Log.i(TAG, "Get ${medias.size} medias")
-        emit(medias)
-    }.flowOn(Dispatchers.IO)
+        return medias
+    }
 
     override fun queryMovie(
         offset: Int,
         limit: Int
-    ) = flow<List<MediaStoreData>> {
+    ): List<MediaStoreData> {
         val medias = mutableListOf<MediaStoreData>()
         val uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -308,14 +294,14 @@ internal class Shared constructor(
             }
         }
         Log.i(TAG, "Get ${medias.size} medias")
-        emit(medias)
-    }.flowOn(Dispatchers.IO)
+        return medias
+    }
 
 
     override fun queryMusic(
         offset: Int,
         limit: Int
-    ) = flow<List<MediaStoreData>> {
+    ): List<MediaStoreData> {
         val medias = mutableListOf<MediaStoreData>()
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val projection = arrayOf(
@@ -352,8 +338,8 @@ internal class Shared constructor(
             }
         }
         Log.i(TAG, "Get ${medias.size} medias")
-        emit(medias)
-    }.flowOn(Dispatchers.IO)
+        return medias
+    }
 
 
     companion object {
