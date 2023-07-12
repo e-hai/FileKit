@@ -58,4 +58,9 @@ object FileManager {
             )
         }
     }
+
+    fun createFileByAssets(context: Application, assetName: String): Uri {
+        val inputStream = context.assets.open(assetName)
+        return specificStorage(context).saveOther(assetName, inputStream)
+    }
 }
