@@ -5,7 +5,10 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import com.an.file.model.AudioType
+import com.an.file.model.ImageType
 import com.an.file.model.MediaStoreData
+import com.an.file.model.VideoType
 import java.io.*
 import java.lang.Exception
 
@@ -43,16 +46,16 @@ internal class Specific constructor(
 
 
     //放置用户可用图片的标准目录
-    override fun createPicture(fileName: String) =
+    override fun createPicture(fileName: String, mimeType: ImageType) =
         createNewFile(fileName, Environment.DIRECTORY_PICTURES)
 
     //放置用户可用音乐的标准目录
-    override fun createMusic(fileName: String) =
+    override fun createMusic(fileName: String, mimeType: AudioType) =
         createNewFile(fileName, Environment.DIRECTORY_MUSIC)
 
 
     //放置用户可用视频的标准目录
-    override fun createMovie(fileName: String) =
+    override fun createMovie(fileName: String, mimeType: VideoType) =
         createNewFile(fileName, Environment.DIRECTORY_MOVIES)
 
 

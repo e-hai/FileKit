@@ -2,16 +2,19 @@ package com.an.file.functions
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.an.file.model.AudioType
+import com.an.file.model.ImageType
 import com.an.file.model.MediaStoreData
+import com.an.file.model.VideoType
 import java.io.InputStream
 
 interface Storage {
 
-    fun createPicture(fileName: String): Uri
+    fun createPicture(fileName: String, mimeType: ImageType = ImageType.IMAGE_JPEG): Uri
 
-    fun createMusic(fileName: String): Uri
+    fun createMusic(fileName: String, mimeType: AudioType = AudioType.AUDIO_AAC): Uri
 
-    fun createMovie(fileName: String): Uri
+    fun createMovie(fileName: String, mimeType: VideoType = VideoType.VIDEO_MPEG): Uri
 
     fun createOther(fileName: String): Uri
 

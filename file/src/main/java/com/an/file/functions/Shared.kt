@@ -12,8 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import com.an.file.model.MediaStoreData
-import com.an.file.model.MimeType
+import com.an.file.model.*
 import java.io.*
 import java.lang.Exception
 import java.util.*
@@ -25,7 +24,7 @@ internal class Shared constructor(
 ) : Storage {
 
     //放置用户可用图片的公共目录
-    override fun createPicture(fileName: String): Uri {
+    override fun createPicture(fileName: String, mimeType: ImageType): Uri {
         val resolver = context.contentResolver
         val collection =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -38,14 +37,15 @@ internal class Shared constructor(
 
         val details = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Images.Media.MIME_TYPE, MimeType.IMAGE_JPEG)
+            put(MediaStore.Images.Media.MIME_TYPE, mimeType.type)
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis()) //拍摄日期
         }
         return resolver.insert(collection, details) ?: Uri.EMPTY
     }
 
 
     //放置用户可用音乐的公共目录
-    override fun createMusic(fileName: String): Uri {
+    override fun createMusic(fileName: String, mimeType: AudioType): Uri {
         val resolver = context.contentResolver
         val collection =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -58,13 +58,14 @@ internal class Shared constructor(
 
         val details = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Audio.Media.MIME_TYPE, MimeType.AUDIO_OGG)
+            put(MediaStore.Audio.Media.MIME_TYPE, mimeType.type)
+            put(MediaStore.Audio.Media.DATE_TAKEN, System.currentTimeMillis()) //拍摄日期
         }
         return resolver.insert(collection, details) ?: Uri.EMPTY
     }
 
     //放置用户可用视频的公共目录
-    override fun createMovie(fileName: String): Uri {
+    override fun createMovie(fileName: String, mimeType: VideoType): Uri {
         val resolver = context.contentResolver
         val collection =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -77,7 +78,8 @@ internal class Shared constructor(
 
         val details = ContentValues().apply {
             put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Video.Media.MIME_TYPE, MimeType.VIDEO_MPEG)
+            put(MediaStore.Video.Media.MIME_TYPE, mimeType.type)
+            put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis()) //拍摄日期
         }
         return resolver.insert(collection, details) ?: Uri.EMPTY
     }
@@ -94,6 +96,8 @@ internal class Shared constructor(
         )
         val details = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+            put(MediaStore.Downloads.DATE_TAKEN, System.currentTimeMillis()) //拍摄日期
+
         }
         return resolver.insert(collection, details) ?: Uri.EMPTY
     }

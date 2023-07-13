@@ -7,32 +7,35 @@ import androidx.annotation.RawRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.an.file.FileManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-
+    private val storage = FileManager.sharedStorage(App.application)
 
     fun add(fileName: String) {
         viewModelScope.launch {
             flow {
-                val uri = FileManager.specificStorage(App.application)
+                val uri = storage
                     .createPicture(fileName)
                 emit(uri)
-            }.collectLatest {
-                Log.d(TAG, "add finish=${it.path}")
-            }
+            }.flowOn(Dispatchers.IO)
+                .collectLatest {
+                    Log.d(TAG, "add finish=${it.path}")
+                }
         }
     }
 
     fun query() {
         viewModelScope.launch {
             flow {
-                val uri = FileManager.specificStorage(App.application)
+                val uri = storage
                     .queryPicture(0, Int.MAX_VALUE)
                 emit(uri)
-            }.collectLatest {
+            }.flowOn(Dispatchers.IO).collectLatest {
                 Log.d(TAG, "query finish=$it")
             }
         }
@@ -42,10 +45,10 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             flow {
                 val inputStream = App.application.resources.openRawResource(res)
-                val uri = FileManager.specificStorage(App.application)
+                val uri = storage
                     .savePicture(fileName, inputStream)
                 emit(uri)
-            }.collectLatest {
+            }.flowOn(Dispatchers.IO).collectLatest {
                 Log.d(TAG, "save finish=$it")
             }
         }
