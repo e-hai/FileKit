@@ -33,4 +33,7 @@ interface Storage {
     fun queryMovie(offset: Int, limit: Int): List<MediaStoreData>
 
     fun queryMusic(offset: Int, limit: Int): List<MediaStoreData>
+
+    fun queryOther(offset: Int, limit: Int): List<MediaStoreData>
+
 }

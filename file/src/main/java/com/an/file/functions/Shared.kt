@@ -180,7 +180,7 @@ internal class Shared constructor(
         }
 
 
-    private fun queryMedia(
+    private fun queryFiles(
         uri: Uri,
         projection: Array<String>,
         args: Bundle
@@ -227,7 +227,7 @@ internal class Shared constructor(
         args.putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
         args.putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
 
-        queryMedia(uri, projection, args)?.use { cursor ->
+        queryFiles(uri, projection, args)?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val dateModifiedColumn =
                 cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
@@ -272,7 +272,7 @@ internal class Shared constructor(
         args.putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
         args.putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
 
-        queryMedia(uri, projection, args)?.use { cursor ->
+        queryFiles(uri, projection, args)?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
             val dateModifiedColumn =
                 cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
@@ -316,12 +316,52 @@ internal class Shared constructor(
         val args = Bundle()
         args.putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
         args.putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
-        queryMedia(uri, projection, args)?.use { cursor ->
+        queryFiles(uri, projection, args)?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val dateModifiedColumn =
                 cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
             val displayNameColumn =
                 cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+
+            Log.i(TAG, "Found ${cursor.count} medias")
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val dateModified =
+                    Date(TimeUnit.SECONDS.toMillis(cursor.getLong(dateModifiedColumn)))
+                val displayName = cursor.getString(displayNameColumn)
+                val contentUri = ContentUris.withAppendedId(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id
+                )
+                val media = MediaStoreData(id, displayName, dateModified, contentUri)
+                medias += media
+                if (medias.size > limit) {
+                    Log.i(TAG, "count over limit $limit")
+                    break
+                }
+            }
+        }
+        Log.i(TAG, "Get ${medias.size} medias")
+        return medias
+    }
+
+    override fun queryOther(offset: Int, limit: Int): List<MediaStoreData> {
+        val medias = mutableListOf<MediaStoreData>()
+        val uri = MediaStore.Downloads.EXTERNAL_CONTENT_URI
+        val projection = arrayOf(
+            MediaStore.Downloads._ID,
+            MediaStore.Downloads.DISPLAY_NAME,
+            MediaStore.Downloads.DATE_ADDED
+        )
+        val args = Bundle()
+        args.putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
+        args.putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
+        queryFiles(uri, projection, args)?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID)
+            val dateModifiedColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Downloads.DATE_ADDED)
+            val displayNameColumn =
+                cursor.getColumnIndexOrThrow(MediaStore.Downloads.DISPLAY_NAME)
 
             Log.i(TAG, "Found ${cursor.count} medias")
             while (cursor.moveToNext()) {

@@ -5,12 +5,14 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
+import androidx.core.net.toUri
 import com.an.file.model.AudioType
 import com.an.file.model.ImageType
 import com.an.file.model.MediaStoreData
 import com.an.file.model.VideoType
 import java.io.*
 import java.lang.Exception
+import java.util.*
 
 
 internal class Specific constructor(
@@ -22,16 +24,9 @@ internal class Specific constructor(
     //删除已存在的文件，并新建一个文件，
     private fun createNewFile(
         fileName: String,
-        type: String
+        path: String
     ): Uri {
-        val file = if (isExternalStorageWritable()) {
-            val dir = if (isCache) context.externalCacheDir else context.getExternalFilesDir(type)
-            File(dir, fileName)
-        } else {
-            val dir = if (isCache) File(context.cacheDir, type) else File(context.filesDir, type)
-            dir.mkdirs()
-            File(dir, fileName)
-        }
+        val file = File(getDir(path), fileName)
         if (file.exists()) {
             file.delete()
         }
@@ -44,6 +39,11 @@ internal class Specific constructor(
         }
     }
 
+    private fun getDir(path: String): File {
+        val dir = if (isCache) File(context.cacheDir, path) else File(context.filesDir, path)
+        dir.mkdirs()
+        return dir
+    }
 
     //放置用户可用图片的标准目录
     override fun createPicture(fileName: String, mimeType: ImageType) =
@@ -61,7 +61,7 @@ internal class Specific constructor(
 
     //存储文档或其他文件的标准目录
     override fun createOther(fileName: String) =
-        createNewFile(fileName, Environment.DIRECTORY_DOCUMENTS)
+        createNewFile(fileName, Environment.DIRECTORY_DOWNLOADS)
 
 
     private fun saveFile(outputUri: Uri, inputStream: InputStream): Uri {
@@ -134,24 +134,51 @@ internal class Specific constructor(
             }
     }
 
+    private fun queryFiles(dir: File, offset: Int, limit: Int): List<MediaStoreData> {
+        //按照时间排序，并取列表的一部分
+        val fileList = dir.listFiles()?.toList()?.sortedBy {
+            it.lastModified()
+        }?.let {
+            val maxIndex = it.size - 1
+            val start = if (offset > maxIndex) maxIndex else offset
+            val end = if (limit > maxIndex) maxIndex else limit
+            it.subList(start, end)
+        } ?: emptyList()
+
+        val mediaList = mutableListOf<MediaStoreData>()
+        fileList.forEach {
+            mediaList.add(
+                MediaStoreData(
+                    System.currentTimeMillis(),
+                    it.name,
+                    Date(it.lastModified()),
+                    it.toUri()
+                )
+            )
+        }
+        return mediaList
+    }
+
     override fun queryPicture(offset: Int, limit: Int): List<MediaStoreData> {
-        return emptyList()
+        val dir = getDir(Environment.DIRECTORY_PICTURES)
+        return queryFiles(dir, offset, limit)
     }
 
     override fun queryMovie(offset: Int, limit: Int): List<MediaStoreData> {
-        return emptyList()
+        val dir = getDir(Environment.DIRECTORY_MOVIES)
+        return queryFiles(dir, offset, limit)
     }
 
     override fun queryMusic(offset: Int, limit: Int): List<MediaStoreData> {
-        return emptyList()
+        val dir = getDir(Environment.DIRECTORY_MUSIC)
+        return queryFiles(dir, offset, limit)
     }
 
-    /**
-     * Checks if a volume containing external storage is available for read and write.
-     * **/
-    private fun isExternalStorageWritable(): Boolean {
-        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
+    override fun queryOther(offset: Int, limit: Int): List<MediaStoreData> {
+        val dir = getDir(Environment.DIRECTORY_DOWNLOADS)
+        return queryFiles(dir, offset, limit)
     }
+
 
     companion object {
         const val TAG = "Specific"
