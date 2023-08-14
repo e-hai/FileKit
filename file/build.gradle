@@ -13,7 +13,7 @@ android {
         consumerProguardFiles "consumer-rules.pro"
 
         // Creates a property for the FileProvider authority.
-        def filesAuthorityValue = "com.anfile.files"
+        def filesAuthorityValue = rootProject.hasProperty("filesAuthorityValue") ? rootProject.ext.filesAuthorityValue : "an.file"
         // Creates a placeholder property to use in the manifest.
         manifestPlaceholders =
                 [filesAuthority: filesAuthorityValue]
