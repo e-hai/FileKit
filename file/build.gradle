@@ -34,5 +34,5 @@ android {
 }
 
 dependencies {
-    implementation "androidx.fragment:fragment-ktx:1.6.0"
+    implementation "androidx.fragment:fragment-ktx:1.5.0"
 }
