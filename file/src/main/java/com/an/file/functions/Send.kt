@@ -6,6 +6,10 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import androidx.core.content.FileProvider
+import com.an.file.FileManager.TAG
+import java.io.File
 
 
 /**
@@ -13,8 +17,11 @@ import android.os.Build
  * **/
 internal object Send {
 
-    fun sendFile(context: Context, fileUri: Uri, title: String): Boolean {
+    fun sendFile(context: Context, file: File, title: String): Boolean {
         return try {
+            val authority = "${context.packageName}.an.file.path"
+            val fileUri: Uri = FileProvider.getUriForFile(context, authority, file)
+            Log.d(TAG, authority)
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

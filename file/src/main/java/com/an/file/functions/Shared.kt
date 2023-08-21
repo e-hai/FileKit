@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import com.an.file.FileManager.TAG
 import com.an.file.model.*
 import java.io.*
 import java.lang.Exception
@@ -386,7 +387,4 @@ internal class Shared constructor(
     }
 
 
-    companion object {
-        val TAG = Shared::class.simpleName
-    }
 }

@@ -11,11 +11,13 @@ import com.an.file.functions.PermissionsFragment
 import com.an.file.functions.Send.sendFile
 import com.an.file.functions.Shared
 import com.an.file.functions.Specific
+import java.io.File
 
 /**
  * 目标SDK版本为Android 11及以上
  * **/
 object FileManager {
+    val TAG = Shared::class.simpleName
 
     /**
      * 共享的存储空间的文件操作
@@ -34,8 +36,8 @@ object FileManager {
     /**
      * 分享文件给其他应用
      * **/
-    fun send(context: Context, fileUri: Uri, title: String = ""): Boolean {
-        return sendFile(context, fileUri, title)
+    fun send(context: Context, file: File, title: String = ""): Boolean {
+        return sendFile(context, file, title)
     }
 
     fun checkPermission(fragment: Fragment, listener: PermissionListener) {

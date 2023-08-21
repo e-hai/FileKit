@@ -1,9 +1,8 @@
-package com.anfile
+package com.anfile.sample
 
-import android.net.Uri
 import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
+import androidx.core.net.toFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.an.file.FileManager
@@ -12,9 +11,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import java.io.File
 
 class MainViewModel : ViewModel() {
-    private val storage = FileManager.sharedStorage(App.application)
+    private val storage = FileManager.specificStorage(App.application)
+
+     var saveFile: File? = null
 
     fun add(fileName: String) {
         viewModelScope.launch {
@@ -50,9 +52,11 @@ class MainViewModel : ViewModel() {
                 emit(uri)
             }.flowOn(Dispatchers.IO).collectLatest {
                 Log.d(TAG, "save finish=$it")
+                saveFile = it.toFile()
             }
         }
     }
+
 
     companion object {
         const val TAG = "MainViewModel"

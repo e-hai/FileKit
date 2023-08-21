@@ -1,15 +1,13 @@
-package com.anfile
+package com.anfile.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.an.file.FileManager
 import com.an.file.functions.PermissionListener
-import kotlinx.coroutines.flow.collectLatest
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +25,18 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.save).setOnClickListener {
             clickSaveFile()
+        }
+        findViewById<Button>(R.id.share).setOnClickListener {
+            clickShareFile()
+        }
+    }
+
+    private fun clickShareFile() {
+        val file = viewModel.saveFile
+        if (null == file) {
+            Toast.makeText(this, "没有可分享的文件", Toast.LENGTH_SHORT).show()
+        } else {
+            FileManager.send(this, file, "分享一个文件")
         }
     }
 

@@ -12,15 +12,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
 
-//        // Creates a property for the FileProvider authority.
-//        def filesAuthorityValue = rootProject.hasProperty("filesAuthorityValue") ? rootProject.ext.filesAuthorityValue : "an.file"
-//        // Creates a placeholder property to use in the manifest.
-//        manifestPlaceholders =
-//                [filesAuthority: filesAuthorityValue]
-//        // Adds a new field for the authority to the BuildConfig class.
-//        buildConfigField("String",
-//                "FILES_AUTHORITY",
-//                "\"${filesAuthorityValue}\"")
     }
 
     buildTypes {

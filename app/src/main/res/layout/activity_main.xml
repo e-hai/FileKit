@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -27,23 +27,35 @@
 
         <Button
             android:id="@+id/add"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
             android:text="新增" />
 
         <Button
             android:id="@+id/query"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
             android:text="查询" />
 
         <Button
             android:id="@+id/save"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
             android:text="保存" />
+
+        <Button
+            android:id="@+id/share"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:layout_weight="1"
+            android:text="分享" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

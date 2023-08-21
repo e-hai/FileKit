@@ -1,4 +1,4 @@
-package com.anfile
+package com.anfile.sample
 
 import android.app.Application
 

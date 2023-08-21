@@ -1,4 +1,4 @@
-package com.anfile
+package com.sample
 
 import org.junit.Test
 

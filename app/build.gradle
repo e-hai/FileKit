@@ -24,7 +24,7 @@ android {
         }
     }
 
-    namespace 'com.anfile'
+    namespace 'com.anfile.sample'
 }
 
 dependencies {
