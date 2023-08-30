@@ -1,5 +1,6 @@
 package com.an.file
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.net.Uri
@@ -8,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.an.file.functions.*
 import com.an.file.functions.PermissionsFragment
-import com.an.file.functions.Send.sendFile
 import com.an.file.functions.Shared
 import com.an.file.functions.Specific
 import java.io.File
@@ -19,26 +19,6 @@ import java.io.File
 object FileManager {
     val TAG = Shared::class.simpleName
 
-    /**
-     * 共享的存储空间的文件操作
-     * **/
-    fun sharedStorage(context: Application): Storage {
-        return Shared(context)
-    }
-
-    /**
-     * 应用专属存储空间的文件操作
-     * **/
-    fun specificStorage(context: Application, isCache: Boolean = false): Storage {
-        return Specific(context, isCache)
-    }
-
-    /**
-     * 分享文件给其他应用
-     * **/
-    fun send(context: Context, file: File, title: String = ""): Boolean {
-        return sendFile(context, file, title)
-    }
 
     fun checkPermission(fragment: Fragment, listener: PermissionListener) {
         PermissionsFragment.load(fragment).requestPermissions(getPermissions(), listener)
@@ -59,6 +39,36 @@ object FileManager {
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         }
+    }
+
+
+    /**
+     * 共享的存储空间的文件操作-调用该方法前请先调用checkPermission
+     * **/
+    fun sharedStorage(context: Application): Storage {
+        return Shared(context)
+    }
+
+    /**
+     * 应用专属存储空间的文件操作
+     * **/
+    fun specificStorage(context: Application, isCache: Boolean = false): Storage {
+        return Specific(context, isCache)
+    }
+
+    /**
+     * 分享文件给其他应用
+     * **/
+    fun send(context: Context, file: File, title: String = ""): Boolean {
+        return Send.sendFile(context, file, title)
+    }
+
+    fun pickPhoto(activity: Activity, requestCode: Int) {
+        Picker.pickPhoto(activity, requestCode)
+    }
+
+    fun pickVideo(activity: Activity, requestCode: Int) {
+        Picker.pickVideo(activity, requestCode)
     }
 
     fun createFileByAssets(context: Application, assetName: String): Uri {

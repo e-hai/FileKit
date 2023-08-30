@@ -1,10 +1,14 @@
 package com.anfile.sample
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.activity.viewModels
 import com.an.file.FileManager
 import com.an.file.functions.PermissionListener
@@ -28,6 +32,40 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.share).setOnClickListener {
             clickShareFile()
+        }
+        findViewById<Button>(R.id.pick_photo).setOnClickListener {
+            clickPickPhoto()
+        }
+        findViewById<Button>(R.id.pick_video).setOnClickListener {
+            clickPickVideo()
+        }
+    }
+
+    private fun clickPickVideo() {
+        FileManager.pickVideo(this, 1)
+    }
+
+    private fun clickPickPhoto() {
+        FileManager.pickPhoto(this, 2)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            1 -> {
+                Log.d(TAG, "视频=${data?.data}")
+                val uri = data?.data ?: return
+                findViewById<VideoView>(R.id.videoView).apply {
+                    setVideoURI(uri)
+                    start()
+                }
+            }
+
+            2 -> {
+                Log.d(TAG, "图片=${data?.data}")
+                val uri = data?.data ?: return
+                findViewById<ImageView>(R.id.imageView).setImageURI(uri)
+            }
         }
     }
 
