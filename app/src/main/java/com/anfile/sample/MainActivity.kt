@@ -1,6 +1,7 @@
 package com.anfile.sample
 
 import android.content.Intent
+import android.media.MediaMetadataRetriever
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -55,6 +56,11 @@ class MainActivity : AppCompatActivity() {
             1 -> {
                 Log.d(TAG, "视频=${data?.data}")
                 val uri = data?.data ?: return
+                MediaMetadataRetriever().apply {
+                    setDataSource(this@MainActivity, uri)
+                    val time = extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    Log.d(TAG, "视频时长=${time}毫秒")
+                }
                 findViewById<VideoView>(R.id.videoView).apply {
                     setVideoURI(uri)
                     start()
