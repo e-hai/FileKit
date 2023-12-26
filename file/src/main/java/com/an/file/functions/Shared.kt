@@ -132,7 +132,7 @@ internal class Shared constructor(
         var outputStream: OutputStream? = null
         return try {
             outputStream = context.contentResolver.openOutputStream(picture)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             picture
         } catch (e: Exception) {
             e.printStackTrace()
