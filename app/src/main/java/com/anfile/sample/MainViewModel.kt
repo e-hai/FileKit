@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class MainViewModel : ViewModel() {
-    private val storage = FileManager.specificStorage(App.application)
+    private val storage = FileManager.sharedStorage(App.application)
 
      var saveFile: File? = null
 
@@ -52,7 +52,6 @@ class MainViewModel : ViewModel() {
                 emit(uri)
             }.flowOn(Dispatchers.IO).collectLatest {
                 Log.d(TAG, "save finish=$it")
-                saveFile = it.toFile()
             }
         }
     }

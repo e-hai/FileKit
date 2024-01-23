@@ -91,16 +91,25 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val fileName = edit.text.toString()
-        FileManager.checkPermission(this, object : PermissionListener {
+        FileManager.checkPermissionBeforeWrite(this, object : PermissionListener {
             override fun invoke(isGranted: Boolean) {
+                if(!isGranted){
+                    Toast.makeText(this@MainActivity, "没有权限", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 viewModel.save(fileName, R.raw.test)
+                Toast.makeText(this@MainActivity, "保存成功", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun clickQueryFile() {
-        FileManager.checkPermission(this, object : PermissionListener {
+        FileManager.checkPermissionBeforeRead(this, object : PermissionListener {
             override fun invoke(isGranted: Boolean) {
+                if(!isGranted){
+                    Toast.makeText(this@MainActivity, "没有权限", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 viewModel.query()
             }
         })
@@ -113,9 +122,14 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val fileName = edit.text.toString()
-        FileManager.checkPermission(this, object : PermissionListener {
+        FileManager.checkPermissionBeforeWrite(this, object : PermissionListener {
             override fun invoke(isGranted: Boolean) {
+                if(!isGranted){
+                    Toast.makeText(this@MainActivity, "没有权限", Toast.LENGTH_SHORT).show()
+                    return
+                }
                 viewModel.add(fileName)
+                Toast.makeText(this@MainActivity, "添加成功", Toast.LENGTH_SHORT).show()
             }
         })
     }

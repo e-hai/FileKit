@@ -21,7 +21,7 @@ internal class PermissionsFragment : Fragment() {
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { map ->
             map.forEach {
-                if (it.value == false) {
+                if (!it.value) {
                     listener(false)
                     return@registerForActivityResult
                 }

@@ -19,27 +19,96 @@ import java.io.File
 object FileManager {
     val TAG = Shared::class.simpleName
 
-
-    fun checkPermission(fragment: Fragment, listener: PermissionListener) {
-        PermissionsFragment.load(fragment).requestPermissions(getPermissions(), listener)
+    enum class ReadType {
+        ALL, VIDEO, IMAGE, AUDIO
     }
 
-    fun checkPermission(activity: FragmentActivity, listener: PermissionListener) {
-        PermissionsFragment.load(activity).requestPermissions(getPermissions(), listener)
+    fun checkPermissionBeforeRead(
+        context: Fragment,
+        listener: PermissionListener,
+        readType: ReadType = ReadType.ALL
+    ) {
+        PermissionsFragment.load(context)
+            .requestPermissions(getReadPermission(readType), listener)
     }
 
-    private fun getPermissions(): Array<String> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            arrayOf(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        } else {
+    fun checkPermissionBeforeRead(
+        context: FragmentActivity, listener: PermissionListener,
+        readType: ReadType = ReadType.ALL
+    ) {
+        PermissionsFragment.load(context)
+            .requestPermissions(getReadPermission(readType), listener)
+    }
+
+    private fun getReadPermission(type: ReadType): Array<String> {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             arrayOf(
                 android.Manifest.permission.READ_EXTERNAL_STORAGE,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        } else {
+            when (type) {
+                ReadType.VIDEO -> {
+                    arrayOf(
+                        android.Manifest.permission.READ_MEDIA_VIDEO
+                    )
+                }
+
+                ReadType.AUDIO -> {
+                    arrayOf(
+                        android.Manifest.permission.READ_MEDIA_IMAGES
+                    )
+                }
+
+                ReadType.IMAGE -> {
+                    arrayOf(
+                        android.Manifest.permission.READ_MEDIA_AUDIO
+                    )
+                }
+
+                else -> {
+                    arrayOf(
+                        android.Manifest.permission.READ_MEDIA_VIDEO,
+                        android.Manifest.permission.READ_MEDIA_IMAGES,
+                        android.Manifest.permission.READ_MEDIA_AUDIO
+                    )
+                }
+            }
         }
     }
+
+    fun checkPermissionBeforeWrite(fragment: Fragment, listener: PermissionListener) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listener.invoke(true)
+        } else {
+            PermissionsFragment.load(fragment)
+                .requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ), listener
+                )
+        }
+    }
+
+    fun checkPermissionBeforeWrite(activity: FragmentActivity, listener: PermissionListener) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listener.invoke(true)
+        } else {
+            PermissionsFragment.load(activity)
+                .requestPermissions(
+                    arrayOf(
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ), listener
+                )
+        }
+    }
+
 
 
     /**

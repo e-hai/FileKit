@@ -24,16 +24,14 @@ internal object Send {
         return try {
             val authority = "${context.packageName}.an.file.path"
             val fileUri: Uri = FileProvider.getUriForFile(context, authority, file)
-            Log.d(TAG, authority)
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 putExtra(Intent.EXTRA_STREAM, fileUri)
                 type = context.contentResolver.getType(fileUri)
             }
-            context.startActivity(Intent.createChooser(shareIntent, title))
-
             val chooser = Intent.createChooser(shareIntent, title)
+
             val resInfoList: List<ResolveInfo> =
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     context.packageManager.queryIntentActivities(
@@ -75,7 +73,7 @@ internal object Picker {
             )
         } else {
             Intent(MediaStore.ACTION_PICK_IMAGES).apply {
-                type = "images/*"
+                type = "image/*"
             }
         }
         activity.startActivityForResult(intent, requestCode)
