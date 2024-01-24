@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import com.an.file.functions.*
 import com.an.file.functions.PermissionsFragment
 import com.an.file.functions.Shared
@@ -14,7 +15,7 @@ import com.an.file.functions.Specific
 import java.io.File
 
 /**
- * 目标SDK版本为Android 11及以上
+ * 目标SDK版本为Android 14及以上
  * **/
 object FileManager {
     val TAG = Shared::class.simpleName
@@ -28,20 +29,23 @@ object FileManager {
         listener: PermissionListener,
         readType: ReadType = ReadType.ALL
     ) {
-        PermissionsFragment.load(context)
-            .requestPermissions(getReadPermission(readType), listener)
+        checkPermissionBeforeRead(context.childFragmentManager, listener, readType)
     }
 
     fun checkPermissionBeforeRead(
-        context: FragmentActivity, listener: PermissionListener,
+        context: FragmentActivity,
+        listener: PermissionListener,
         readType: ReadType = ReadType.ALL
     ) {
-        PermissionsFragment.load(context)
-            .requestPermissions(getReadPermission(readType), listener)
+        checkPermissionBeforeRead(context.supportFragmentManager, listener, readType)
     }
 
-    private fun getReadPermission(type: ReadType): Array<String> {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+    private fun checkPermissionBeforeRead(
+        fragmentManager: FragmentManager,
+        listener: PermissionListener,
+        type: ReadType = ReadType.ALL
+    ) {
+        val perms = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             arrayOf(
                 android.Manifest.permission.READ_EXTERNAL_STORAGE,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -79,36 +83,37 @@ object FileManager {
                 }
             }
         }
+
+        PermissionsFragment
+            .load(fragmentManager)
+            .requestPermissions(perms, listener)
     }
 
+
     fun checkPermissionBeforeWrite(fragment: Fragment, listener: PermissionListener) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            listener.invoke(true)
-        } else {
-            PermissionsFragment.load(fragment)
-                .requestPermissions(
-                    arrayOf(
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ), listener
-                )
-        }
+        checkPermissionBeforeRead(fragment.childFragmentManager, listener)
     }
 
     fun checkPermissionBeforeWrite(activity: FragmentActivity, listener: PermissionListener) {
+        checkPermissionBeforeRead(activity.supportFragmentManager, listener)
+    }
+
+    private fun checkPermissionBeforeWrite(
+        fragmentManager: FragmentManager,
+        listener: PermissionListener
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             listener.invoke(true)
         } else {
-            PermissionsFragment.load(activity)
-                .requestPermissions(
-                    arrayOf(
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ), listener
-                )
+            val perms = arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            PermissionsFragment
+                .load(fragmentManager)
+                .requestPermissions(perms, listener)
         }
     }
-
 
 
     /**

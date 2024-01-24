@@ -60,15 +60,8 @@ internal class PermissionsFragment : Fragment() {
         private const val TAG = "PermissionsFragment"
 
 
-        fun load(activity: FragmentActivity): PermissionsFragment {
-            return load(activity.supportFragmentManager)
-        }
 
-        fun load(fragment: Fragment): PermissionsFragment {
-            return load(fragment.childFragmentManager)
-        }
-
-        private fun load(fragmentManager: FragmentManager): PermissionsFragment {
+        fun load(fragmentManager: FragmentManager): PermissionsFragment {
             var fragment = fragmentManager.findFragmentByTag(TAG)
             if (null == fragment) {
                 fragment = PermissionsFragment().also {

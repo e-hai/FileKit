@@ -17,6 +17,7 @@ import java.io.File
 
 /**
  * 调用系统自带API-分享文件
+ * 注意点：只能分享应用自身的文件
  * **/
 internal object Send {
 
