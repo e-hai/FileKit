@@ -1,5 +1,6 @@
 package com.anfile.sample
 
+import android.net.Uri
 import android.util.Log
 import androidx.annotation.RawRes
 import androidx.core.net.toFile
@@ -16,7 +17,7 @@ import java.io.File
 class MainViewModel : ViewModel() {
     private val storage = FileManager.sharedStorage(App.application)
 
-     var saveFile: File? = null
+    var saveFile: Uri? = null
 
     fun add(fileName: String) {
         viewModelScope.launch {
@@ -27,6 +28,7 @@ class MainViewModel : ViewModel() {
             }.flowOn(Dispatchers.IO)
                 .collectLatest {
                     Log.d(TAG, "add finish=${it.path}")
+                    saveFile = it
                 }
         }
     }
@@ -52,6 +54,7 @@ class MainViewModel : ViewModel() {
                 emit(uri)
             }.flowOn(Dispatchers.IO).collectLatest {
                 Log.d(TAG, "save finish=$it")
+                saveFile = it
             }
         }
     }

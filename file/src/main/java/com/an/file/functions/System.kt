@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import com.an.file.BuildConfig
 import com.an.file.FileManager.TAG
 import java.io.File
@@ -22,14 +23,25 @@ import java.io.File
 internal object Send {
 
     fun sendFile(context: Context, file: File, title: String): Boolean {
+        val authority = "${context.packageName}.an.file.path"
+        val fileUri: Uri = FileProvider.getUriForFile(context, authority, file)
+        return sendFile(context, fileUri, title)
+    }
+
+    fun sendFile(context: Context, fileUri: Uri, title: String): Boolean {
         return try {
-            val authority = "${context.packageName}.an.file.path"
-            val fileUri: Uri = FileProvider.getUriForFile(context, authority, file)
+            val uri = if (fileUri.toString().startsWith("file://")) {
+                val authority = "${context.packageName}.an.file.path"
+                FileProvider.getUriForFile(context, authority, fileUri.toFile())
+            } else {
+                fileUri
+            }
+
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                putExtra(Intent.EXTRA_STREAM, fileUri)
-                type = context.contentResolver.getType(fileUri)
+                putExtra(Intent.EXTRA_STREAM, uri)
+                type = context.contentResolver.getType(uri)
             }
             val chooser = Intent.createChooser(shareIntent, title)
 

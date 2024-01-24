@@ -137,6 +137,10 @@ object FileManager {
         return Send.sendFile(context, file, title)
     }
 
+    fun send(context: Context, fileUri: Uri, title: String = ""): Boolean {
+        return Send.sendFile(context, fileUri, title)
+    }
+
     fun pickPhoto(activity: Activity, requestCode: Int) {
         Picker.pickPhoto(activity, requestCode)
     }
