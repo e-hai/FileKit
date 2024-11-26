@@ -1,4 +1,4 @@
-package com.an.file.functions
+package com.kit.file.functions
 
 import android.app.Activity
 import android.content.Context
@@ -11,8 +11,8 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
-import com.an.file.BuildConfig
-import com.an.file.FileManager.TAG
+import com.kit.file.BuildConfig
+import com.kit.file.FileManager.TAG
 import java.io.File
 
 

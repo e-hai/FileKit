@@ -1,4 +1,4 @@
-package com.an.file.model
+package com.kit.file.model
 
 import android.net.Uri
 import java.util.*

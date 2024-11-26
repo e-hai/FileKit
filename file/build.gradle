@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 21
@@ -21,9 +21,17 @@ android {
         }
     }
 
-    namespace "com.an.file"
+    namespace "com.kit.file"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
-    implementation "androidx.fragment:fragment-ktx:1.6.1"
+    implementation "androidx.fragment:fragment-ktx:1.8.5"
 }

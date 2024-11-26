@@ -12,7 +12,7 @@
     <application>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.an.file.path"
+            android:authorities="${applicationId}.kit.file.path"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

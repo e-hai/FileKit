@@ -1,4 +1,4 @@
-package com.an.file.functions
+package com.kit.file.functions
 
 import android.Manifest
 import android.content.pm.PackageManager

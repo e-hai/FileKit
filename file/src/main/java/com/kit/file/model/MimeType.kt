@@ -1,4 +1,4 @@
-package com.an.file.model
+package com.kit.file.model
 
 enum class VideoType(val type: String) {
     VIDEO_MPEG("video/mpeg"),

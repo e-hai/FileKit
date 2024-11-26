@@ -1,4 +1,4 @@
-package com.anfile.sample
+package com.kit.file.sample
 
 import android.content.Intent
 import android.media.MediaMetadataRetriever
@@ -11,8 +11,8 @@ import android.widget.ImageView
 import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.viewModels
-import com.an.file.FileManager
-import com.an.file.functions.PermissionListener
+import com.kit.file.FileManager
+import com.kit.file.functions.PermissionListener
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.pick_video).setOnClickListener {
             clickPickVideo()
         }
+
+        viewModel.init()
     }
 
     private fun clickPickVideo() {
